@@ -1,4 +1,4 @@
-function [prob, data] = add_hetphasecond(prob, oid)
+function [prob, phasdata] = add_hetphasecond(prob, oid)
 %% ad phase condition for heteroclinic
 phasdata = init_data(prob, oid);
 [fdata, uidx] = coco_get_func_data(prob, oid, 'data', 'uidx');

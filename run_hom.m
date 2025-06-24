@@ -35,7 +35,7 @@ prob = ode_po2po(prob, '', runidbet, 2);
 prob = coco_xchg_pars(prob, 'gamma', 'po.period');
 prob = po_add_func(prob, '', 'saddle_q', ...
   @(data,xbp,T0,T,p)saddle_q(data,xbp,T0,T,p,funcs,1,1e-2), eqnames, 'regular');
-prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',50,'norm', inf,'h_max',100,'PtMX', [5000,0]);
+prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'h_max',100,'PtMX', [5500,50]);
 
 fprintf('\n Following the curve of homoclinic orbits')
 
@@ -48,11 +48,15 @@ coco_plot_bd(thm,runidhom,'mu', 'gamma','MAX(x)')
 coco_plot_bd(thm,runidhom,'mu', 'gamma','MIN(x)')
 
 %% animate time profiles
+hb=coco_bd_table('hill_hb_run');
+snpo=coco_bd_table('hill_snpo_run');
+sn1=coco_bd_table('hill_sn_run1');
+sn2=coco_bd_table('hill_sn_run2');
 hombd=coco_bd_table(runidhom);
 labs=coco_bd_labs(runidhom);
 idx=coco_bd_lab2idx(runidhom,labs);
 clr=lines();
-figure(3);clf;tiledlayout(1,2);
+figure(3);clf;tiledlayout(1,3);
 txt={'FontSize',18};
 ms={'MarkerSize',12};
 for i=1:length(labs)
@@ -82,6 +86,15 @@ for i=1:length(labs)
     hold(ax4,'off');
     xlim(ax4,[-8,8]);
     ylim(ax4,[-6,6]);
+    nexttile(3);ax5=gca;hold(ax5,'off');
+    plot(ax5, sn1.('mu'),sn1.('gamma'),'-','color',clr(1,:),'LineWidth',3);
+    hold(ax5,'on');
+    %plot(ax5, sn2.('mu'),sn2.('gamma'),'-','color',clr(1,:),'LineWidth',3);
+    plot(ax5, hb.('mu'),hb.('gamma'),'r-','LineWidth',3);
+    plot(ax5, hombd.('mu'),hombd.('gamma'),'k.-','LineWidth',1);
+    plot(ax5,sol.p(ip.mu),sol.p(ip.gamma),'ko','MarkerFaceColor',clr(3,:),ms{:});
+    ax5.XLim=[-0.03,0.01];
+    ax5.YLim=[3.58,3.61];
     drawnow
 end
 
