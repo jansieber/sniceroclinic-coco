@@ -7,7 +7,7 @@ y(iv.mu),y(iv.alpha),y(iv.beta),y(iv.gamma));
 p([ip.mu,ip.alpha,ip.beta,ip.gamma])=[...
       mu;   alpha;   beta;   gamma];
 p=p(:);
-[s1,s2,dist]=deal(y(iv.s1),y(iv.s2),y(iv.dist));
+[s1,s2]=deal(y(iv.s1),y(iv.s2));%,y(iv.dist));
 [usn,ubc(:,1),ubc(:,2)]=deal([xeq;yeq],[x0;y0],[x1;y1]);
 % right and left eigenvector for 0 in usn
 [vsn,wsn,~,Jsn]=snic_eigspace(funcs.dfdx,usn,p,ubc(:,1));
@@ -17,8 +17,8 @@ rsn_d=det(Jsn);
 if ~isnan(s1)
     rprojsn=usn+vsn*s1-ubc(:,1);
     lprojsn=wsn'*(ubc(:,2)-usn)-s2;
-    resdist=sum((ubc(:,2)-usn).^2)-dist^2;
-    res=[rsn;rsn_d;rprojsn;lprojsn;resdist];
+    %resdist=sum((ubc(:,2)-usn).^2)-dist^2;
+    res=[rsn;rsn_d;rprojsn;lprojsn];%;resdist];
     return
 end
 % else, suggest svals

@@ -33,9 +33,9 @@ yrdist=cellfun(@(y,xsn,ysn)norm(y(:,end)-[xsn;ysn]),...
 retdistlarge=yrdist>retbd;
 retonly=retdistlarge&~s2large;
 ok=~s2large&~retdistlarge;
-ncok=abs(ncsnic.dist)<1e-1;
+ncok=abs(ncsnic.dist)<1e-1&ncsnic.mu<=0;
 plot3(ax1,ncsnic.mu(ncok),ncsnic.gamma(ncok),ncsnic.beta(ncok),...
-    'o','color',(clr(4,:)+1)/2,lw{:},'DisplayName',...
+    'o-','color',(clr(4,:)+1)/2,lw{:},'DisplayName',...
     sprintf('NC SNIC'));
 plot3(ax1,homsnic_phase.mu(retonly),homsnic_phase.gamma(retonly),homsnic_phase.beta(retonly),...
     'o','color',(clr(2,:)+1)/2,lw{:},'DisplayName',...
@@ -50,14 +50,14 @@ view(ax1,[10,10]);
 xlabel(ax1,'$\mu$',ltx{:});
 ylabel(ax1,'$\gamma$',ltx{:});
 zlabel(ax1,'$\beta$',ltx{:});
-zlim(ax1,[-3.5,0.5]);
+zlim(ax1,[-3.2,0.5]);
 xlim(ax1,[-0.12,0.01]);
 set(ax1,txt{:},lw{:})
 %%
 nexttile;ax2=gca;
 %%
-labrows=arrayfun(@(i)~isempty(ncsnic{i,'LAB'}{1})&ncok(i),1:length(ncok));
-labs=cell2mat(ncsnic{labrows,'LAB'});
+labrows=arrayfun(@(i)~isempty(ncsnic{i,'LAB'})&ncok(i),1:length(ncok));
+labs=ncsnic{labrows,'LAB'};
 npt=length(labs);
 if exportplot
     irg=20;
@@ -76,8 +76,10 @@ for i=irg
     plot(ax2,u(:,1),u(:,2),lw{:});
     hold(ax2,'on');
     usn=ch.x([iv_nc.xeq,iv_nc.yeq]);
-    vsn=snic_eigspace(funcs.dfdx,usn,cs.p,ch.x([iv_nc.x0,iv_nc.y0]));
-    T=100;
+    [vsn,~,~,J]=snic_eigspace(funcs.dfdx,usn,cs.p,ch.x([iv_nc.x0,iv_nc.y0]));
+    ev=eig(J);
+    [~,ix]=sort(abs(ev),'descend');
+    ev=ev(1);
     plot(ax2,usn(1),usn(2),'ko','MarkerSize',10,'MarkerFaceColor','y');
     plot(ax2,usn(1)+h0*vsn(1)*[-1,1],usn(2)+h0*vsn(2)*[-1,1],'k-',lw{:});
     hold(ax2,'off');
@@ -85,20 +87,21 @@ for i=irg
     %ylim(ax2,[-15,10]);
     xlabel(ax2,'$x$',ltx{:});
     ylabel(ax2,'$y$',ltx{:});
+    axis(ax2,'equal');
     set(ax2, txt{:},lw{:})
     ax2.YLimitMethod='padded';
     ax2.XLimitMethod='padded';    
     pcoords={cs.p(ip.mu),cs.p(ip.gamma),cs.p(ip.beta)};
     title(ax2,...
-        sprintf('i=%3d, $\\mu=$%6.3f, $\\gamma=$%6.3f, $\\beta=$%6.3f, $s_1=$%5.3e, $s_2$=%5.3e',...
-        i,pcoords{:},ch.x(iv_nc.s1),ch.x(iv_nc.s2)),ltx{:});
+        sprintf('i=%3d, $\\mu=$%6.3f, $\\gamma=$%6.3f, $\\beta=$%6.3f, tr ev$=%4.2g$',...
+        i,pcoords{:},ev),ltx{:});
     if ~pl1init
         pl1init=true;
         plseg=plot3(ax1,pcoords{:},'ko','MarkerSize',12,'MarkerFaceColor','r','HandleVisibility','off');
     else
         [plseg.XData,plseg.YData,plseg.ZData]=deal(pcoords{:});
     end
-    pause%(0.2);
+    pause(0.2);
     drawnow
     if exportvideo
         frame=getframe(figure(2));
@@ -109,5 +112,5 @@ if exportvideo
     close(vid);
 end
 if exportplot
-    exportgraphics(figure(2),'homsnic.pdf');
+    exportgraphics(figure(2),'homncsnic.pdf');
 end

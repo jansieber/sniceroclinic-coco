@@ -2,8 +2,11 @@ function animate_timeprofiles(iv,ip,funcs,bdrun,snbd,hombd,varargin)
 default={'pause',{0.2},'figure',2,'h0',1e-1,'labels',[]};
 opts=dde_set_options(default,varargin,'pass_on');
 bdsnic=coco_bd_table(bdrun);
-labrows=cellfun(@(s)~isempty(s),bdsnic{:,'LAB'});
-labs=cell2mat(bdsnic{labrows,'LAB'});
+labs=bdsnic{:,'LAB'};
+if iscell(labs)
+    labrows=cellfun(@(s)~isempty(s),labs);
+    labs=cell2mat(bdsnic{labrows,'LAB'});
+end
 figure(opts.figure);clf;
 tl=tiledlayout(1,2);nexttile;ax1=gca;
 lw={'linewidth',2};
@@ -23,7 +26,11 @@ if isempty(opts.labels)
 end
 for i=irg
     lab=labs(i);
-    [cs,ds]=coll_read_solution('seg',bdrun,lab,'chart','data');
+    try
+        [cs,ds]=coll_read_solution('seg',bdrun,lab,'chart','data');
+    catch
+        continue
+    end
     t=cs.tbp;
     u=cs.xbp;
     ch=coco_read_solution('snic',bdrun,lab,'chart');

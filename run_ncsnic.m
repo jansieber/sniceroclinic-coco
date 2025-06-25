@@ -30,7 +30,7 @@ snic_pt=hombd(snic_id,:);
 snic_lab=snic_pt.LAB;
 [psol,u0,cseg]=coll_from_sol('po.orb.coll',runidhom,snic_lab);
 [seg,ueq,dev,S,V0,W0]=coll_split(psol,funcs.dfdx);
-newnames={'xeq','yeq','s1','s2','dist'};
+newnames={'xeq','yeq','s1','s2'};%,'dist'};
 varnames=[params,{'x0','y0','x1','y1'},newnames];
 ic=[varnames;num2cell(1:length(varnames))];
 iv=struct(ic{:});
@@ -39,8 +39,8 @@ y0_bdsnic([iv.mu,iv.gamma,iv.alpha,iv.beta])=psol.parameter(:);
 y0_bdsnic=y0_bdsnic(:);
 [u0,u1]=deal(seg.profile(:,1),seg.profile(:,end));
 y0_bdsnic([  iv.xeq,  iv.yeq])=ueq;
-y0_bdsnic([iv.x0,iv.y0, iv.x1,iv.y1,iv.s1,iv.s2,iv.dist])=...
-          [u0(1), u0(2),u1(1),u1(2),dev(1),dev(2),dev(3)];
+y0_bdsnic([iv.x0,iv.y0, iv.x1,iv.y1,iv.s1,iv.s2])=...
+          [u0(1), u0(2),u1(1),u1(2),dev(1),dev(2)];
 [~,res]=snic_res('',snic_data,y0_bdsnic);
 disp('initial residual at boundary')
 disp(res);
@@ -48,32 +48,32 @@ tini0=[reshape(psol.mesh(1:end-1,:),[],1);psol.mesh(end)];
 tini=tini0*psol.period;
 uini=coll_eva(psol,tini0);
 isolargs={tini(:),uini',psol.parameter(:)};
-shvals=struct('xeq',ueq(1),'yeq',ueq(2),'s1',dev(1),'s2',dev(2),'dist',dev(3));
+shvals=struct('xeq',ueq(1),'yeq',ueq(2),'s1',dev(1),'s2',dev(2));
 %%
 prob=init_snic(coco_prob(),'init',snic_data,'isolargs',isolargs,'table',shvals);
-prob=add_hetphasecond(prob,'seg.coll');
-prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'h_max',100,'PtMX', [20,20]);
+prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'PtMX', [20,20]);
 fprintf('\n correcting snic in 1 parameter\n')
-coco(prob, 'snic_ini', [], 0, {'mu','s1','s2','xeq','yeq','dist','x1','y1'}, [-10 10]);
+coco(prob, 'snic_ini', [], 0, {'mu','s1','s2','xeq','yeq','x1','y1','T'}, [-10 10]);
 %% reload run, now increasing T to reduce abs(s2) freeing T and dropping phase
 eplabs=coco_bd_labs('snic_ini','EP');
 prob=init_snic(coco_prob(),'reload',snic_data,'run','snic_ini','lab',eplabs(2));
-prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',100,'norm', inf,'h_max',500,'PtMX', [0,1200]);
+prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',100,'norm', inf,'h_max',100,'PtMX', [0,1200]);
 fprintf('\n Reduce s2 by increasing T\n')
-coco(prob, 'snic_s2', [], 1, {'T','s2','mu','xeq','yeq','dist','x1','y1'}, [170 400]);
+coco(prob, 'snic_s2', [], 1, {'T','s2','s1','mu','xeq','yeq','x1','y1'}, [170 2000]);
 %% reload run, change mu, gamma, detect s2=0
 eps2labs=coco_bd_labs('snic_s2','EP');
 prob=init_snic(coco_prob(),'reload',snic_data,'run','snic_s2','lab',eps2labs(2));
-prob = coco_add_event(prob, 'NCSNIC', 'boundary','s2','>',0);
-prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',20,'norm', inf,'h_max',100,'PtMX', [200,500]);
+prob = coco_add_event(prob, 'NCSNIC','boundary', 's2','>',0);
+prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'PtMX', [10,20]);
 fprintf('\n vary two parameters, check s2\n')
-coco(prob, 'snic2nc', [], 1, {'mu','gamma','s2','dist','xeq','yeq','x1','y1'}, [-0.05,0]);
+coco(prob, 'snic2nc', [], 1, {'mu','gamma','s1','s2','xeq','yeq','x1','y1','dist'}, [-0.05,0]);
 %%
 animate_timeprofiles(iv,ip,funcs,'snic2nc',sn1,hombd);
 %% reload run, continue NCSNIC in mu, gamma, beta, fixing s2=0
 nclabs=coco_bd_labs('snic2nc','NCSNIC');
 prob=init_snic(coco_prob(),'reload',snic_data,'run','snic2nc','lab',nclabs);
-prob = coco_add_event(prob, 'NCSNIC', 'boundary','s2','>',1e0);
-prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',10,'norm', inf,'h_max',200,'PtMX', 2000);
-fprintf('\n vary two parameters, check s2\n')
-coco(prob, 'ncsnic3par', [], 1, {'mu','gamma','beta','dist','xeq','yeq','x1','y1'}, {[-1.2,0],[-9,5],[-5,0]});
+prob = coco_add_event(prob, 'NCSNIC', 'boundary','dist','>',1e0);
+prob = coco_add_event(prob, 'NCSNIC', 'boundary','mu','>',0);
+prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'PtMX', 2000,'h0',1e-3);
+fprintf('\n vary three parameters\n')
+coco(prob, 'ncsnic3par', [], 1, {'mu','gamma','beta','s1','xeq','yeq','x1','y1','dist'}, {[-1.2,0],[-9,5],[-5,0]});
