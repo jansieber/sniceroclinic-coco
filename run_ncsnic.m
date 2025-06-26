@@ -76,4 +76,4 @@ prob = coco_add_event(prob, 'invalid', 'boundary','dist','>',1e0);
 prob = coco_add_event(prob, 'NCSNIC', 'boundary','mu','>',0);
 prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'PtMX', 2000,'h0',1e-3);
 fprintf('\n vary three parameters\n')
-coco(prob, 'ncsnic3par', [], 1, {'mu','gamma','beta','s1','xeq','yeq','x1','y1','dist'}, {[-1.2,0],[-9,5],[-5,0]});
+coco(prob, 'ncsnic', [], 1, {'mu','gamma','beta','s1','xeq','yeq','x1','y1','dist'}, {[-1.2,0],[-9,5],[-5,0]});
