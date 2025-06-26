@@ -1,7 +1,7 @@
 %% plot homsnics along branch
 clear
 exportvideo=false;
-exportplot=false;
+exportplot=true;
 hill_top_def;
 s=load('homsnic_phase.mat');
 homsnic_phase=s.homsnic_phase;
@@ -60,7 +60,7 @@ labrows=arrayfun(@(i)~isempty(ncsnic{i,'LAB'})&ncok(i),1:length(ncok));
 labs=ncsnic{labrows,'LAB'};
 npt=length(labs);
 if exportplot
-    irg=20;
+    irg=50;
 else
     irg=1:npt;
 end
@@ -112,5 +112,6 @@ if exportvideo
     close(vid);
 end
 if exportplot
-    exportgraphics(figure(2),'homncsnic.pdf');
+    exportgraphics(figure(2),'ncsnic.pdf');
+    saveas(figure(2),'nc_homsnic.fig');
 end

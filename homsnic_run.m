@@ -19,8 +19,8 @@ hombd=coco_bd_table(runidhom);
 labs=coco_bd_labs(runidhom);
 idx=coco_bd_lab2idx(runidhom,labs);
 %%
-%[~,idxmin]=min(abs(abs((hombd{idx,'tr1'}-hombd{idx,'tr2'})')-0.5));
-[fnmin,idxmin]=min(max(hombd{idx,{'fn1','fn2'}},[],2));
+[~,idxmin]=min(abs(abs((hombd{idx,'tr1'}-hombd{idx,'tr2'})')-0.5));
+%[fnmin,idxmin]=min(max(hombd{idx,{'fn1','fn2'}},[],2));
 imin=idx(idxmin);
 pohomsnic=po_read_solution(runidhom,labs(idxmin));
 shvals=hombd(imin,:);
@@ -42,7 +42,7 @@ T=tini(end);
 homsnic_data=struct('iv',iv,'ip',ip,'funcs',funcs);
 isolargs={tini,uini,params,pini};
 %%
-figure(2);
+figure(2);clf;
 plot(tini,uini,'o-');
 prob=init_homsnic(coco_prob(),'init',homsnic_data,'isolargs',isolargs,'table',shvals);
 prob=add_hetphasecond(prob,'seg.coll');
@@ -50,19 +50,20 @@ prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'h_max',100,'PtMX'
 %%
 fprintf('\n correcting homsnic in 2 parameters\n')
 coco(prob, 'homsnic_ini', [], 0, [{'mu', 'gamma'},newnames], [-10 10]);
-%% reload run, now increasing T to reduce s2 freeing T and dropping phase
+%% reload run, now increasing T to reduce s1,s2 freeing T
 eplabs=coco_bd_labs('homsnic_ini','EP');
 prob=init_homsnic(coco_prob(),'reload',homsnic_data,'run','homsnic_ini','lab',eplabs(2));
-prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',5,'norm', inf,'h_max',100,'PtMX', [0,20]);
-fprintf('\n Reduce s2 by increasing T\n')
-coco(prob, 'homsnic_s2', [], 1, [{'T','s2','mu', 'gamma'},newnames(1:end-2)], [80 120]);
+prob=add_hetphasecond(prob,'seg.coll');
+prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',5,'norm', inf,'h_max',100,'PtMX', [0,50]);
+fprintf('\n Reduce s1 and s2 by increasing T\n')
+coco(prob, 'homsnic_s2', [], 1, [{'T','mu', 'gamma'},newnames], [60 1000]);
 %% reload run, continue homsnic in 3 parameters fixing T, phase, leaving s1,s2 free
 eplabs=coco_bd_labs('homsnic_s2','EP');
 prob=init_homsnic(coco_prob(),'reload',homsnic_data,'run','homsnic_s2','lab',eplabs(2));
 prob=add_hetphasecond(prob,'seg.coll');
-prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'h_max',100,'PtMX', [-50,50]);
+prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'h_max',10,'PtMX', [-30,50]);
 fprintf('\n Continue homsnic in 3 parameters`n')
-coco(prob, 'homsnic_phase', [], 1, [{'mu', 'gamma','beta'},newnames], [-20,20]);
+coco(prob, 'homsnic_phase', [], 1, [{'mu', 'gamma','beta'},newnames], [-20,0]);
 %% check return trajectory
 homsnic_phase=coco_bd_table('homsnic_phase');
 npt=size(homsnic_phase,1);

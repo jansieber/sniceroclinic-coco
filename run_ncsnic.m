@@ -72,7 +72,7 @@ animate_timeprofiles(iv,ip,funcs,'snic2nc',sn1,hombd);
 %% reload run, continue NCSNIC in mu, gamma, beta, fixing s2=0
 nclabs=coco_bd_labs('snic2nc','NCSNIC');
 prob=init_snic(coco_prob(),'reload',snic_data,'run','snic2nc','lab',nclabs);
-prob = coco_add_event(prob, 'NCSNIC', 'boundary','dist','>',1e0);
+prob = coco_add_event(prob, 'invalid', 'boundary','dist','>',1e0);
 prob = coco_add_event(prob, 'NCSNIC', 'boundary','mu','>',0);
 prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'PtMX', 2000,'h0',1e-3);
 fprintf('\n vary three parameters\n')
