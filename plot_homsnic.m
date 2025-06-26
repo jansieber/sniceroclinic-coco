@@ -46,7 +46,7 @@ view(ax1,[-75,10]);
 xlabel(ax1,'$\mu$',ltx{:});
 ylabel(ax1,'$\gamma$',ltx{:});
 zlabel(ax1,'$\beta$',ltx{:});
-zlim(ax1,[-6,0.5]);
+zlim(ax1,[-3.2,0.5]);
 set(ax1,txt{:},lw{:})
 %%
 nexttile;ax2=gca;

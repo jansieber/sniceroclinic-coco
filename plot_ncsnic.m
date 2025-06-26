@@ -1,7 +1,7 @@
 %% plot homsnics along branch
 clear
 exportvideo=false;
-exportplot=true;
+exportplot=false;
 hill_top_def;
 s=load('homsnic_phase.mat');
 homsnic_phase=s.homsnic_phase;
