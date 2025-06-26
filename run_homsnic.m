@@ -63,18 +63,18 @@ prob=init_homsnic(coco_prob(),'reload',homsnic_data,'run','homsnic_s2','lab',epl
 prob=add_hetphasecond(prob,'seg.coll');
 prob = coco_set(prob, 'cont', 'NAdapt', 1,'NPR',1,'norm', inf,'h_max',10,'PtMX', [-30,50]);
 fprintf('\n Continue homsnic in 3 parameters`n')
-coco(prob, 'homsnic_phase', [], 1, [{'mu', 'gamma','beta'},newnames], [-20,0]);
+coco(prob, 'homsnic', [], 1, [{'mu', 'gamma','beta'},newnames], [-20,0]);
 %% check return trajectory
-homsnic_phase=coco_bd_table('homsnic_phase');
-npt=size(homsnic_phase,1);
+homsnic=coco_bd_table('homsnic');
+npt=size(homsnic,1);
 irg=1:npt;
 T=100;
 tret=linspace(0,T,100*T+1);
 clear t_return u_return
 for i=1:length(irg)
-    lab=homsnic_phase.LAB(irg(i));
+    lab=homsnic.LAB(irg(i));
     fprintf('extracting i=%d of %d,lab=%d\n',i,npt,lab);
-    ch=coco_read_solution('homsnic','homsnic_phase',lab,'chart');
+    ch=coco_read_solution('homsnic','homsnic',lab,'chart');
     p=ch.x(ismember(fieldnames(iv),params));
     [usn,usa]=deal([ch.x(iv.xeq1);ch.x(iv.yeq1)],[ch.x(iv.xeq2);ch.x(iv.yeq2)]);
     [vsa,dsa]=eig(funcs.dfdx(usa,p));
@@ -86,6 +86,6 @@ for i=1:length(irg)
     t_return{irg(i)}=tret;
     u_return{irg(i)}=uret;
 end
-homsnic_phase.('t_return')=t_return(:);
-homsnic_phase.('u_return')=u_return(:);
-save('homsnic_phase.mat','homsnic_phase');
+homsnic.('t_return')=t_return(:);
+homsnic.('u_return')=u_return(:);
+save('homsnic.mat','homsnic');

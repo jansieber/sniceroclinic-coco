@@ -3,8 +3,8 @@ clear
 exportvideo=false;
 exportplot=false;
 hill_top_def;
-s=load('homsnic_phase.mat');
-homsnic_phase=s.homsnic_phase;
+s=load('homsnic.mat');
+homsnic=s.homsnic;
 homsnicnames={'xeq1','yeq1','xeq2','yeq2','s1','s2'};
 homsnicvarnames=[params,{'x0','y0','x1','y1'},homsnicnames];
 ic_hs=[homsnicvarnames;num2cell(1:length(homsnicvarnames))];
@@ -27,18 +27,18 @@ txt={'FontSize',20,'FontName','Courier','FontWeight','bold'};
 hold(ax1,'on');
 clr=lines();
 [s2bd,retbd]=deal(0.2,0.1);
-s2large=homsnic_phase.s2>s2bd;
+s2large=homsnic.s2>s2bd;
 yrdist=cellfun(@(y,xsn,ysn)norm(y(:,end)-[xsn;ysn]),...
-    homsnic_phase.u_return,num2cell(homsnic_phase.xeq1),num2cell(homsnic_phase.yeq1));
+    homsnic.u_return,num2cell(homsnic.xeq1),num2cell(homsnic.yeq1));
 retdistlarge=yrdist>retbd;
 retonly=retdistlarge&~s2large;
 ok=~s2large&~retdistlarge;
-plot3(ax1,homsnic_phase.mu(retonly),homsnic_phase.gamma(retonly),homsnic_phase.beta(retonly),...
+plot3(ax1,homsnic.mu(retonly),homsnic.gamma(retonly),homsnic.beta(retonly),...
     'o','color',(clr(2,:)+1)/2,lw{:},'DisplayName',...
     sprintf('$\\|u_\\mathrm{ret}(T)-u_\\mathrm{SN}\\|>%g$\n(no cycle)',retbd));
-plot3(ax1,homsnic_phase.mu(s2large),homsnic_phase.gamma(s2large),homsnic_phase.beta(s2large),...
+plot3(ax1,homsnic.mu(s2large),homsnic.gamma(s2large),homsnic.beta(s2large),...
     'o','color',(clr(1,:)+1)/2,lw{:},'DisplayName',sprintf('$s_2>%g$',s2bd));
-plot3(ax1,homsnic_phase.mu(ok),homsnic_phase.gamma(ok),homsnic_phase.beta(ok),...
+plot3(ax1,homsnic.mu(ok),homsnic.gamma(ok),homsnic.beta(ok),...
     'o-','color',clr(1,:),lw{:},'DisplayName','homsnic');
 legend(ax1,ltx{:});
 grid(ax1,'on');
@@ -50,7 +50,7 @@ zlim(ax1,[-3.2,0.5]);
 set(ax1,txt{:},lw{:})
 %%
 nexttile;ax2=gca;
-npt=size(homsnic_phase,1);
+npt=size(homsnic,1);
 if exportplot
     irg=40;
 else
@@ -62,7 +62,7 @@ for i=1:length(irg)
     if ~ok(i) && ok_only
         continue
     end
-    lab=homsnic_phase.LAB(irg(i));
+    lab=homsnic.LAB(irg(i));
     [cs,ds]=coll_read_solution('seg','homsnic_phase',lab,'chart','data');
     t=cs.tbp;
     u=cs.xbp;
