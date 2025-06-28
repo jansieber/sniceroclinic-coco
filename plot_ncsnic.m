@@ -3,8 +3,7 @@ clear
 exportvideo=false;
 exportplot=false;
 hill_top_def;
-s=load('homsnic.mat');
-homsnic=s.homsnic;
+homsnic=coco_bd_table('homsnic');
 homsnicnames={'xeq1','yeq1','xeq2','yeq2','s1','s2'};
 homsnicvarnames=[params,{'x0','y0','x1','y1'},homsnicnames];
 ic_hs=[homsnicvarnames;num2cell(1:length(homsnicvarnames))];

@@ -14,7 +14,7 @@ ic=[params;num2cell(1:length(params))];
 ip=struct(ic{:});
 if exist('sys_hill', 'file')~=2
     syms x y
-    sym(params{:})
+    syms(params)
     f=[x^2-(mu+gamma*(gamma+alpha^2-beta^2)/((alpha+beta)^2))+2*alpha*y-gamma;
         y^2-(mu+gamma*(gamma+alpha^2-beta^2)/((alpha+beta)^2))+2*beta*x+gamma];
     F = sco_sym2funcs(f, {[x; y], [mu; gamma; alpha; beta]}, ...
