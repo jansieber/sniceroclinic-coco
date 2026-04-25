@@ -21,5 +21,5 @@ Computations require Matlab
 
 
 ## Resulting images
-* [outputs/Figure2.html](https://github.com/jansieber/main/outputs/Figure2.html)
-* [outputs/Figure5.html](https://github.com/jansieber/main/outputs/Figure5.html)
+* [outputs/Figure2.html](https://github.com/jansieber/blob/main/outputs/Figure2.html)
+* [outputs/Figure5.html](https://github.com/jansieber/blob/main/outputs/Figure5.html)
