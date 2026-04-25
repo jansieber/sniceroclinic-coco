@@ -18,3 +18,8 @@ Computations require Matlab
 6. Execute script `plot_homsnic` to generate plots.
 7. Execute script `run_ncsnic` to obtain bifurcation curve for non-central SNIC in 3 parameters mu, gamma, beta. Results will be stored in subfolder `data/ncsnic` (run is called `ncsnic`).
 8. Execute script `plot_ncsnic` to generate plots.
+
+
+## Resulting images
+* `outputs/Figure2.html`
+* `outputs/Figure5.html`
