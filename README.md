@@ -23,3 +23,5 @@ Computations require Matlab
 ## Resulting images
 * [outputs/Figure2.html](https://jansieber.github.io/sniceroclinic-coco/outputs/Figure2.html)
 * [outputs/Figure5.html](https://jansieber.github.io/sniceroclinic-coco/outputs/Figure5.html)
+* * [outputs/Figure2-Hopf-L1.html](https://jansieber.github.io/sniceroclinic-coco/outputs/Figure2-Hopf-L1.html)
+
